@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ورشة استراتيجيات جديدة وتحديات العصر</title>
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.3/xlsx.full.min.js"></script>
+    <script>
+        (function(){
+            emailjs.init("vopJ5NuO8_4ArYO0ku"); // استبدل YOUR_PUBLIC_KEY بمفتاح EmailJS الخاص بك
+        })();
+    </script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            direction: rtl;
+            text-align: center;
+            background-image: url('background.png');
+            background-size: cover;
+            background-position: center;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 50%;
+            margin: 50px auto;
+            padding: 20px;
+            background: white;
+            box-shadow: 0px 0px 10px #d4af37;
+            border-radius: 10px;
+            border: 2px solid #d4af37;
+            position: relative;
+        }
+        .logo-left, .logo-right {
+            position: absolute;
+            top: 50px;
+            width: 350px;
+        }
+        .logo-left { left: 50px; }
+        .logo-right { right: 50px; }
+        h2 { color: #b8860b; }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #d4af37;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #d4af37;
+            color: white;
+            font-size: 18px;
+            padding: 10px;
+            width: 100%;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover { background-color: #b8860b; }
+        .thank-you-message {
+            display: none;
+            margin-top: 20px;
+            color: green;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <img src="logo-left.png.png" class="logo-left" alt="شعار اليسار">
+    <img src="logo-right.png.png" class="logo-right" alt="شعار اليمين">
+
+    <div class="container">
+        <h2>ورشة استراتيجيات جديدة وتحديات العصر</h2>
+        <p id="status-message" style="color: red; font-weight: bold;"></p>
+        <form id="registration-form">
+            <input type="text" id="first-name" placeholder="الاسم الأول" required>
+            <input type="text" id="position" placeholder="المنصب" required>
+            <input type="text" id="unit" placeholder="الوحدة" required>
+            <input type="text" id="rank" placeholder="الرتبة" required>
+            <input type="text" id="job-title" placeholder="المسمى الوظيفي" required>
+            <input type="text" id="contact-number" placeholder="رقم التواصل" required>
+            <input type="email" id="email" placeholder="الإيميل" required>
+            <button type="submit" id="submit-btn">تسجيل</button>
+        </form>
+
+        
+        <div class="thank-you-message" id="thank-you-message">
+            <p>شكراً لتسجيلك! يمكنك طباعة برنامج الورشة و Gate Pass من هنا.</p>
+            <div class="print-section" id="print-section">
+                <img src="schedule.png" alt="جدول الورشة" style="width: 100%; max-width: 600px;">
+                <button onclick="window.print()">طباعة</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        const maxParticipants = 70;
+        let registeredParticipants = 0;
+        const registrationDeadline = new Date("2025-04-06").getTime();
+        let registrations = [];
+        
+        function checkRegistrationStatus() {
+            const now = new Date().getTime();
+            if (registeredParticipants >= maxParticipants || now > registrationDeadline) {
+                document.getElementById("status-message").innerText = "تم إغلاق التسجيل!";
+                document.getElementById("submit-btn").disabled = true;
+            }
+        }
+        
+        document.getElementById("registration-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+            if (registeredParticipants < maxParticipants && new Date().getTime() <= registrationDeadline) {
+                registeredParticipants++;
+                document.getElementById("thank-you-message").style.display = "block";
+                checkRegistrationStatus();
+                
+                let formData = {
+                    name: document.getElementById("first-name").value,
+                    position: document.getElementById("position").value,
+                    unit: document.getElementById("unit").value,
+                    rank: document.getElementById("rank").value,
+                    jobTitle: document.getElementById("job-title").value,
+                    contactNumber: document.getElementById("contact-number").value,
+                    email: document.getElementById("email").value
+                };
+                registrations.push(formData);
+            }
+        });
+        
+        function sendExcelByEmail() {
+            let wb = XLSX.utils.book_new();
+            let ws = XLSX.utils.json_to_sheet(registrations);
+            XLSX.utils.book_append_sheet(wb, ws, "المسجلين");
+            let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'base64' });
+            
+            emailjs.send("service_gu6q4kq", "template_5wbwzru", {
+                to_email: "yasmeenqa26@gmail.com",
+                excel_file: wbout
+            }).then(function(response) {
+                alert("تم إرسال البيانات بنجاح إلى البريد الإلكتروني!");
+            }, function(error) {
+                alert("فشل الإرسال، يرجى المحاولة مرة أخرى.");
+            });
+
+        }
+        
+        checkRegistrationStatus();
+    </script>
+</body>
+</html>
+
+
